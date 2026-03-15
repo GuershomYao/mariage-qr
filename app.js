@@ -2,7 +2,7 @@ let invites = {};
 let scanner = null;
 
 // Code admin (vous pouvez le changer)
-const ADMIN_CODE = "admin123";
+const ADMIN_CODE = "";
 
 // Charger les données JSON
 fetch("invites.json")
