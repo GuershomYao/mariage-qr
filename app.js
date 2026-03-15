@@ -71,25 +71,55 @@ function startScan() {
     
     document.getElementById("reader").style.display = "block";
     
+    // Nettoyer l'ancien scanner s'il existe
+    if (scanner) {
+        try {
+            scanner.stop().then(() => {
+                scanner.clear();
+            }).catch(() => {});
+        } catch(e) {}
+    }
+    
     scanner = new Html5Qrcode("reader");
+    
+    // Configuration pour mobile
+    const config = {
+        fps: 10,
+        qrbox: function(viewfinderWidth, viewfinderHeight) {
+            let minEdgePercentage = 0.7;
+            let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+            let qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
+            return {
+                width: qrboxSize,
+                height: qrboxSize
+            };
+        },
+        aspectRatio: 1.0
+    };
     
     scanner.start(
         { facingMode: "environment" },
-        {
-            fps: 15,
-            qrbox: { width: 300, height: 300 }
+        config,
+        function(decodedText, decodedResult) {
+            console.log("QR Code détecté:", decodedText);
+            onScanSuccess(decodedText, decodedResult);
         },
-        onScanSuccess,
-        onScanError
+        function(errorMessage) {
+            // Ignorer les erreurs de scan (normal pendant la recherche)
+            // Ne pas logger pour éviter le spam dans la console
+        }
     ).then(() => {
         isScanning = true;
         startBtn.style.display = "none";
+        console.log("Scanner démarré avec succès");
     }).catch(err => {
         console.error("Erreur caméra:", err);
-        alert("Erreur lors du démarrage de la caméra. Veuillez autoriser l'accès à la caméra.");
+        alert("Erreur lors du démarrage de la caméra. Veuillez autoriser l'accès à la caméra.\n\n" + (err.message || err));
         startBtn.disabled = false;
         startBtn.textContent = "📷 Lancer le scan";
         document.getElementById("reader").style.display = "none";
+        isScanning = false;
+        scanner = null;
     });
 }
 
@@ -110,13 +140,14 @@ function stopScan() {
     }
 }
 
-// Erreur de scan
-function onScanError(errorMessage) {
-    // Ignorer les erreurs de scan (normal pendant la recherche)
-}
-
 // Succès du scan
-function onScanSuccess(decodedText) {
+function onScanSuccess(decodedText, decodedResult) {
+    console.log("QR Code scanné:", decodedText);
+    
+    if (!scanner || !isScanning) {
+        return;
+    }
+    
     scanner.pause();
     
     let code = decodedText.trim();
