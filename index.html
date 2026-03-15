@@ -2,32 +2,58 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Contrôle invités mariage</title>
+<title>Scan invités mariage</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
 
 body{
-  margin:0;
-  font-family:Arial;
-  text-align:center;
-  background:black;
-  color:white;
+margin:0;
+font-family:Arial;
+background:black;
 }
 
 #reader{
-  width:100vw;
-  height:70vh;
+width:100vw;
+height:100vh;
 }
 
-#result{
-  font-size:28px;
-  padding:20px;
+/* POPUP */
+
+#popup{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+display:none;
+align-items:center;
+justify-content:center;
 }
 
-h1{
-  padding:10px;
+#popup-content{
+background:white;
+padding:40px;
+border-radius:10px;
+text-align:center;
+width:80%;
+max-width:400px;
+}
+
+#popup-result{
+font-size:24px;
+margin-bottom:20px;
+}
+
+button{
+font-size:20px;
+padding:15px 30px;
+border:none;
+background:#28a745;
+color:white;
+border-radius:6px;
 }
 
 </style>
@@ -36,11 +62,14 @@ h1{
 
 <body>
 
-<h1>Scanner QR Code</h1>
-
 <div id="reader"></div>
 
-<h2 id="result"></h2>
+<div id="popup">
+  <div id="popup-content">
+    <div id="popup-result"></div>
+    <button onclick="restartScan()">Scanner suivant</button>
+  </div>
+</div>
 
 <script src="app.js"></script>
 
