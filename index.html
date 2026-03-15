@@ -8,15 +8,31 @@
 
 <style>
 
-body{
+html,body{
 margin:0;
-font-family:Arial;
+padding:0;
+width:100%;
+height:100%;
 background:black;
+font-family:Arial;
 }
 
+/* CAMERA PLEIN ECRAN */
+
 #reader{
+position:fixed;
+top:0;
+left:0;
 width:100vw;
 height:100vh;
+}
+
+/* VIDEO FULLSCREEN */
+
+#reader video{
+width:100% !important;
+height:100% !important;
+object-fit:cover;
 }
 
 /* POPUP */
@@ -27,33 +43,58 @@ top:0;
 left:0;
 width:100%;
 height:100%;
-background:rgba(0,0,0,0.8);
 display:none;
 align-items:center;
 justify-content:center;
+z-index:10;
 }
 
 #popup-content{
-background:white;
+
+color:white;
 padding:40px;
-border-radius:10px;
+border-radius:12px;
 text-align:center;
-width:80%;
-max-width:400px;
+
+width:85%;
+max-width:500px;
+
+font-size:28px;
+
 }
 
-#popup-result{
-font-size:24px;
-margin-bottom:20px;
+/* COULEURS RESULTATS */
+
+.valid{
+background:#1faa00;
+}
+
+.used{
+background:#ff9800;
+}
+
+.invalid{
+background:#e00000;
 }
 
 button{
-font-size:20px;
-padding:15px 30px;
+
+margin-top:25px;
+
+font-size:22px;
+
+padding:15px 35px;
+
 border:none;
-background:#28a745;
+
+border-radius:8px;
+
+background:black;
+
 color:white;
-border-radius:6px;
+
+cursor:pointer;
+
 }
 
 </style>
@@ -65,10 +106,10 @@ border-radius:6px;
 <div id="reader"></div>
 
 <div id="popup">
-  <div id="popup-content">
-    <div id="popup-result"></div>
-    <button onclick="restartScan()">Scanner suivant</button>
-  </div>
+<div id="popup-content">
+<div id="popup-result"></div>
+<button onclick="restartScan()">Scanner suivant</button>
+</div>
 </div>
 
 <script src="app.js"></script>
