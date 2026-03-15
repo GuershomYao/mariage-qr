@@ -69,13 +69,17 @@ showPopup(
 scanner = new Html5Qrcode("reader");
 
 scanner.start(
+ { facingMode: "environment" },
+ {
+   fps: 10,
+   qrbox: function(viewfinderWidth, viewfinderHeight) {
 
-{ facingMode: "environment" },
+     let minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+     let scanSize = Math.floor(minEdge * 0.8);
 
-{
-fps:10,
-qrbox:false
-},
+     return { width: scanSize, height: scanSize };
 
-onScanSuccess
-);
+   }
+ },
+ onScanSuccess
+);;
