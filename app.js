@@ -21,7 +21,6 @@ popup.style.display="flex";
 function restartScan(){
 
 document.getElementById("popup").style.display="none";
-
 scanner.resume();
 
 }
@@ -30,12 +29,13 @@ function onScanSuccess(decodedText){
 
 scanner.pause();
 
-let guest = invites[decodedText];
+let code = decodedText.trim();
+
+let guest = invites[code];
 
 if(!guest){
 
 showPopup("❌ Invité inconnu","invalid");
-
 return;
 
 }
@@ -69,17 +69,18 @@ showPopup(
 scanner = new Html5Qrcode("reader");
 
 scanner.start(
- { facingMode: "environment" },
- {
-   fps: 10,
-   qrbox: function(viewfinderWidth, viewfinderHeight) {
 
-     let minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-     let scanSize = Math.floor(minEdge * 0.8);
+{ facingMode: "environment" },
 
-     return { width: scanSize, height: scanSize };
+{
+fps:15,
+qrbox:300
+},
 
-   }
- },
- onScanSuccess
-);;
+onScanSuccess
+
+).catch(err => {
+
+console.error("Erreur caméra:", err);
+
+});
