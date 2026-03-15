@@ -3,6 +3,36 @@ let scanner = null;
 
 // Code admin (vous pouvez le changer)
 const ADMIN_CODE = "";
+// Fonction pour jouer un son de scan réussi
+function playScanSound() {
+    try {
+        // Créer un contexte audio
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Créer un oscillateur pour générer un son
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        // Connecter l'oscillateur au gain puis à la sortie
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // Configuration du son (fréquence et type d'onde)
+        oscillator.frequency.value = 800; // Fréquence en Hz (son aigu)
+        oscillator.type = 'sine'; // Type d'onde (sine = son doux)
+        
+        // Configuration du volume (gain)
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime); // Volume à 30%
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2); // Fade out
+        
+        // Démarrer et arrêter le son
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.2); // Durée de 200ms
+    } catch (error) {
+        // Si l'API AudioContext n'est pas disponible, ignorer silencieusement
+        console.log("Impossible de jouer le son:", error);
+    }
+}
 
 // Charger les données JSON
 fetch("invites.json")
@@ -103,6 +133,9 @@ function onScanError(errorMessage) {
 
 // Fonction de callback pour le scan réussi (basée sur l'ancien code)
 function onScanSuccess(decodedText) {
+        // Jouer le son de scan
+    playScanSound();
+    
     let code = decodedText.trim();
     let guest = invites[code];
     
