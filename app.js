@@ -1,6 +1,5 @@
 let invites = {};
 let scanner = null;
-let isScanning = false;
 
 // Code admin (vous pouvez le changer)
 const ADMIN_CODE = "admin123";
@@ -49,22 +48,20 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // Déconnexion
 function logout() {
-    if (isScanning && scanner) {
-        stopScan();
+    if (scanner) {
+        scanner.clear();
+        scanner = null;
     }
     document.getElementById("login-page").style.display = "flex";
     document.getElementById("main-page").style.display = "none";
     document.getElementById("header").style.display = "none";
+    document.getElementById("reader").innerHTML = "";
     document.getElementById("admin-code").value = "";
     document.getElementById("admin-code").focus();
 }
 
 // Démarrer le scan
 function startScan() {
-    if (isScanning) {
-        return;
-    }
-    
     const startBtn = document.getElementById("start-scan-btn");
     startBtn.disabled = true;
     startBtn.textContent = "Scan en cours...";
@@ -74,96 +71,50 @@ function startScan() {
     // Nettoyer l'ancien scanner s'il existe
     if (scanner) {
         try {
-            scanner.stop().then(() => {
-                scanner.clear();
-            }).catch(() => {});
-        } catch(e) {}
-    }
-    
-    scanner = new Html5Qrcode("reader");
-    
-    // Configuration pour mobile
-    const config = {
-        fps: 10,
-        qrbox: function(viewfinderWidth, viewfinderHeight) {
-            let minEdgePercentage = 0.7;
-            let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-            let qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
-            return {
-                width: qrboxSize,
-                height: qrboxSize
-            };
-        },
-        aspectRatio: 1.0
-    };
-    
-    scanner.start(
-        { facingMode: "environment" },
-        config,
-        function(decodedText, decodedResult) {
-            console.log("QR Code détecté:", decodedText);
-            onScanSuccess(decodedText, decodedResult);
-        },
-        function(errorMessage) {
-            // Ignorer les erreurs de scan (normal pendant la recherche)
-            // Ne pas logger pour éviter le spam dans la console
-        }
-    ).then(() => {
-        isScanning = true;
-        startBtn.style.display = "none";
-        console.log("Scanner démarré avec succès");
-    }).catch(err => {
-        console.error("Erreur caméra:", err);
-        alert("Erreur lors du démarrage de la caméra. Veuillez autoriser l'accès à la caméra.\n\n" + (err.message || err));
-        startBtn.disabled = false;
-        startBtn.textContent = "📷 Lancer le scan";
-        document.getElementById("reader").style.display = "none";
-        isScanning = false;
-        scanner = null;
-    });
-}
-
-// Arrêter le scan
-function stopScan() {
-    if (scanner && isScanning) {
-        scanner.stop().then(() => {
             scanner.clear();
-            isScanning = false;
-            document.getElementById("reader").style.display = "none";
-            const startBtn = document.getElementById("start-scan-btn");
-            startBtn.style.display = "block";
-            startBtn.disabled = false;
-            startBtn.textContent = "📷 Lancer le scan";
-        }).catch(err => {
-            console.error("Erreur lors de l'arrêt du scanner:", err);
-        });
+        } catch(e) {
+            console.log("Nettoyage du scanner");
+        }
     }
+    
+    // Vider le conteneur reader
+    document.getElementById("reader").innerHTML = "";
+    
+    // Créer le scanner avec Html5QrcodeScanner (ancienne méthode qui fonctionnait)
+    scanner = new Html5QrcodeScanner(
+        "reader",
+        { 
+            fps: 10, 
+            qrbox: 250 
+        },
+        false // verbose = false
+    );
+    
+    // Rendre le scanner avec le callback
+    scanner.render(onScanSuccess, onScanError);
+    
+    startBtn.style.display = "none";
 }
 
-// Succès du scan
-function onScanSuccess(decodedText, decodedResult) {
-    console.log("QR Code scanné:", decodedText);
-    
-    if (!scanner || !isScanning) {
-        return;
-    }
-    
-    scanner.pause();
-    
+// Gestion des erreurs de scan
+function onScanError(errorMessage) {
+    // Ignorer les erreurs de scan (normal pendant la recherche)
+}
+
+// Fonction de callback pour le scan réussi (basée sur l'ancien code)
+function onScanSuccess(decodedText) {
     let code = decodedText.trim();
     let guest = invites[code];
     
     if (!guest) {
-        showPopup("❌ Invité inconnu<br>Code: " + code, "invalid");
+        showPopup("❌ Invité inconnu", "invalid");
         return;
     }
     
     if (guest.used) {
         showPopup(
-            "⚠️ Déjà utilisé<br><br>" + 
-            "Nom: " + guest.nom + 
-            "<br>Nombre: " + guest.Number + 
-            "<br>Table: " + guest.table,
+            "⚠️ Déjà utilisé : " + guest.nom + 
+            "<br>Table : " + guest.table,
             "used"
         );
         return;
@@ -173,10 +124,9 @@ function onScanSuccess(decodedText, decodedResult) {
     guest.used = true;
     
     showPopup(
-        "✅ Invité validé<br><br>" +
-        "Nom: " + guest.nom +
-        "<br>Nombre: " + guest.Number +
-        "<br>Table: " + guest.table,
+        "✅ " + guest.nom +
+        "<br>Nombre : " + guest.Number +
+        "<br>Table : " + guest.table,
         "valid"
     );
 }
@@ -194,7 +144,5 @@ function showPopup(message, type) {
 // Reprendre le scan
 function restartScan() {
     document.getElementById("popup").style.display = "none";
-    if (scanner && isScanning) {
-        scanner.resume();
-    }
+    // Le scanner Html5QrcodeScanner reprend automatiquement après la fermeture du popup
 }
