@@ -30,7 +30,7 @@ function onScanSuccess(decodedText) {
 
 const scanner = new Html5QrcodeScanner(
  "reader",
- { fps: 10, qrbox: 250 }
+ { fps: 10, qrbox: { width: 300, height: 300 } }
 );
 
 scanner.render(onScanSuccess);
