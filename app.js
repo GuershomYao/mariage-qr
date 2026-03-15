@@ -153,14 +153,14 @@ function onScanSuccess(decodedText) {
         return;
     }
     
-
+    // Marquer comme utilisé
+    guest.used = true;
     showPopup(
         "✅ " + guest.nom +
         "<br>Nombre : " + guest.Number +
         "<br>Table : " + guest.table,
         "valid"
-    // Marquer comme utilisé
-    guest.used = true;
+
     
     );
 }
