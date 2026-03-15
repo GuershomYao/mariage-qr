@@ -5,14 +5,25 @@ fetch("invites.json")
 .then(response => response.json())
 .then(data => invites = data);
 
-function showPopup(message){
+function showPopup(message,type){
+
+let popup = document.getElementById("popup");
+let content = document.getElementById("popup-content");
+
+content.className = type;
+
 document.getElementById("popup-result").innerHTML = message;
-document.getElementById("popup").style.display = "flex";
+
+popup.style.display="flex";
+
 }
 
 function restartScan(){
-document.getElementById("popup").style.display = "none";
+
+document.getElementById("popup").style.display="none";
+
 scanner.resume();
+
 }
 
 function onScanSuccess(decodedText){
@@ -22,21 +33,35 @@ scanner.pause();
 let guest = invites[decodedText];
 
 if(!guest){
-showPopup("❌ Invité inconnu");
+
+showPopup("❌ Invité inconnu","invalid");
+
 return;
+
 }
 
 if(guest.used){
-showPopup("⚠️ Déjà utilisé<br>"+guest.nom);
+
+showPopup(
+"⚠️ Déjà utilisé<br>"+guest.nom+
+"<br>Table : "+guest.table,
+"used"
+);
+
 return;
+
 }
 
 guest.used = true;
 
 showPopup(
+
 "✅ "+guest.nom+
 "<br>Nombre : "+guest.Number+
-"<br>Table : "+guest.table
+"<br>Table : "+guest.table,
+
+"valid"
+
 );
 
 }
@@ -44,10 +69,13 @@ showPopup(
 scanner = new Html5Qrcode("reader");
 
 scanner.start(
+
 { facingMode: "environment" },
+
 {
 fps:10,
-qrbox:{ width:300, height:300 }
+qrbox:false
 },
+
 onScanSuccess
 );
