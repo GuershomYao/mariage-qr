@@ -1,36 +1,53 @@
 let invites = {};
+let scanner;
 
 fetch("invites.json")
 .then(response => response.json())
 .then(data => invites = data);
 
-function onScanSuccess(decodedText) {
-
- let guest = invites[decodedText];
-
- if(!guest){
-   document.getElementById("result").innerHTML =
-   "❌ Invité inconnu";
-   return;
- }
-
- if(guest.used){
-   document.getElementById("result").innerHTML =
-   "⚠️ Déjà utilisé : " + guest.nom;
-   return;
- }
-
- guest.used = true;
-
- document.getElementById("result").innerHTML =
-   "<br>Nombre : " + guest.Number +
-   "✅ " + guest.nom +
-   "<br>Table : " + guest.table;
+function showPopup(message){
+document.getElementById("popup-result").innerHTML = message;
+document.getElementById("popup").style.display = "flex";
 }
 
-const scanner = new Html5QrcodeScanner(
- "reader",
- { fps: 10, qrbox: { width: 300, height: 300 } }
+function restartScan(){
+document.getElementById("popup").style.display = "none";
+scanner.resume();
+}
+
+function onScanSuccess(decodedText){
+
+scanner.pause();
+
+let guest = invites[decodedText];
+
+if(!guest){
+showPopup("❌ Invité inconnu");
+return;
+}
+
+if(guest.used){
+showPopup("⚠️ Déjà utilisé<br>"+guest.nom);
+return;
+}
+
+guest.used = true;
+
+showPopup(
+"✅ "+guest.nom+
+"<br>Nombre : "+guest.Number+
+"<br>Table : "+guest.table
 );
 
-scanner.render(onScanSuccess);
+}
+
+scanner = new Html5Qrcode("reader");
+
+scanner.start(
+{ facingMode: "environment" },
+{
+fps:10,
+qrbox:{ width:300, height:300 }
+},
+onScanSuccess
+);
