@@ -23,6 +23,7 @@ function onScanSuccess(decodedText) {
  guest.used = true;
 
  document.getElementById("result").innerHTML =
+   "<br>Nombre : " + guest.Number +
    "✅ " + guest.nom +
    "<br>Table : " + guest.table;
 }
