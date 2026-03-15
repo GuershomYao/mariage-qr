@@ -16,5 +16,11 @@
    "nom": "GASSIHOUN Seth",
    "table": "Table 5",
    "used": false
+ },
+	 "INV004": {
+   "Number": "03",
+   "nom": "KPOKA Timothée, KPOKA Grâce, KPOKA Divine",
+   "table": "Table 5",
+   "used": false
  }
 }
