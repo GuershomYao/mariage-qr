@@ -164,7 +164,7 @@ function onScanSuccess(decodedText) {
         return;
     }
     
-    if (guest.used) {
+    else if (guest.used) {
         showPopup(
             "⚠️ Déjà utilisé : " + guest.nom + 
             "<br>Table : " + guest.table,
@@ -173,6 +173,7 @@ function onScanSuccess(decodedText) {
         return;
     }
     
+  else {
     // Marquer comme utilisé
     guest.used = true;
 
@@ -181,7 +182,7 @@ function onScanSuccess(decodedText) {
         "<br>Nombre : " + guest.Number +
         "<br>Table : " + guest.table,
         "valid"
-    );
+    );}
 }
 
 // Afficher le popup
