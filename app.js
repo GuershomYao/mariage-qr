@@ -1,6 +1,13 @@
 let invites = {};
 let scanner = null;
 let isScanning = false;
+let lastScannedCode = null;
+let scanProcessing = false;
+let scanCooldown = false; // Délai d'attente après un scan
+
+// #region agent log
+const DEBUG_LOG = (location, message, data, hypothesisId) => fetch('http://127.0.0.1:7242/ingest/5f34726f-8744-4a30-be6d-0cc4097cc360',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location,message,data:data||{},timestamp:Date.now(),runId:'run1',hypothesisId})}).catch(()=>{});
+// #endregion
 
 // Code admin (vous pouvez le changer)
 const ADMIN_CODE = "";
@@ -96,9 +103,19 @@ function logout() {
 
 // Démarrer le scan
 function startScan() {
+    // #region agent log
+    DEBUG_LOG('app.js:104', 'startScan called', {isScanning, scanProcessing, scanCooldown}, 'E');
+    // #endregion
+    console.log("🚀 startScan appelé, isScanning:", isScanning);
+    
     if (isScanning) {
         return;
     }
+    
+    // Réinitialiser les flags
+    scanProcessing = false;
+    scanCooldown = false;
+    lastScannedCode = null;
     
     const startBtn = document.getElementById("start-scan-btn");
     startBtn.disabled = true;
@@ -130,6 +147,10 @@ function startScan() {
     
     isScanning = true;
     
+    // #region agent log
+    DEBUG_LOG('app.js:134', 'scanner.render called', {isScanning: true}, 'E');
+    // #endregion
+    
     // Rendre le scanner avec le callback
     scanner.render(onScanSuccess, onScanError);
     
@@ -143,28 +164,94 @@ function onScanError(errorMessage) {
 
 // Fonction de callback pour le scan réussi (basée sur l'ancien code)
 function onScanSuccess(decodedText) {
+    // #region agent log
+    DEBUG_LOG('app.js:164', 'onScanSuccess called', {decodedText: decodedText?.substring(0, 20), isScanning, scanProcessing, scanCooldown}, 'A');
+    // #endregion
+    console.log("🔍 onScanSuccess appelé:", decodedText, "scanCooldown:", scanCooldown);
+    
+    // Ignorer les scans pendant le délai d'attente
+    if (scanCooldown) {
+        // #region agent log
+        DEBUG_LOG('app.js:170', 'onScanSuccess ignored - cooldown active', {decodedText: decodedText?.substring(0, 20)}, 'B');
+        // #endregion
+        console.log("⏳ Scan ignoré - délai d'attente actif");
+        return;
+    }
+    
+    // Protection contre les scans multiples - ignorer si déjà en traitement
+    if (scanProcessing) {
+        // #region agent log
+        DEBUG_LOG('app.js:177', 'onScanSuccess ignored - already processing', {decodedText: decodedText?.substring(0, 20)}, 'B');
+        // #endregion
+        console.log("⚠️ Scan ignoré - déjà en traitement");
+        return;
+    }
+    
+    // Ignorer si c'est le même code scanné récemment
+    let code = decodedText.trim();
+    if (lastScannedCode === code) {
+        // #region agent log
+        DEBUG_LOG('app.js:184', 'onScanSuccess ignored - same code', {code}, 'B');
+        // #endregion
+        console.log("⚠️ Scan ignoré - même code:", code);
+        return;
+    }
+    
+    // Marquer comme en traitement et activer le délai d'attente
+    scanProcessing = true;
+    scanCooldown = true;
+    lastScannedCode = code;
+    
     // Arrêter le scanner IMMÉDIATEMENT pour éviter les scans multiples
     if (scanner && isScanning) {
         try {
+            // #region agent log
+            DEBUG_LOG('app.js:196', 'Calling scanner.clear', {hasScanner: !!scanner, isScanning}, 'C');
+            // #endregion
+            console.log("🛑 Arrêt du scanner...");
             scanner.clear();
             isScanning = false;
+            // #region agent log
+            DEBUG_LOG('app.js:202', 'scanner.clear completed', {isScanning: false}, 'C');
+            // #endregion
+            console.log("✅ Scanner arrêté");
         } catch(e) {
-            console.error("Erreur lors de l'arrêt du scanner:", e);
+            console.error("❌ Erreur lors de l'arrêt du scanner:", e);
+            // #region agent log
+            DEBUG_LOG('app.js:208', 'scanner.clear error', {error: e.message || String(e)}, 'C');
+            // #endregion
         }
     }
     
     // Jouer le son de scan
     playScanSound();
     
-    let code = decodedText.trim();
     let guest = invites[code];
     
     if (!guest) {
+        // #region agent log
+        DEBUG_LOG('app.js:219', 'Guest not found', {code}, 'D');
+        // #endregion
+        scanProcessing = false;
+        // Réinitialiser le délai après 2 secondes
+        setTimeout(() => {
+            scanCooldown = false;
+            lastScannedCode = null;
+        }, 2000);
         showPopup("❌ Invité inconnu", "invalid");
         return;
     }
     
-    else if (guest.used) {
+    if (guest.used) {
+        // #region agent log
+        DEBUG_LOG('app.js:232', 'Guest already used', {code, nom: guest.nom}, 'D');
+        // #endregion
+        scanProcessing = false;
+        // Réinitialiser le délai après 2 secondes
+        setTimeout(() => {
+            scanCooldown = false;
+            lastScannedCode = null;
+        }, 2000);
         showPopup(
             "⚠️ Déjà utilisé : " + guest.nom + 
             "<br>Table : " + guest.table,
@@ -173,16 +260,26 @@ function onScanSuccess(decodedText) {
         return;
     }
     
-  else {
     // Marquer comme utilisé
     guest.used = true;
+    // #region agent log
+    DEBUG_LOG('app.js:247', 'Guest marked as used', {code, nom: guest.nom}, 'D');
+    // #endregion
 
     showPopup(
         "✅ " + guest.nom +
         "<br>Nombre : " + guest.Number +
         "<br>Table : " + guest.table,
         "valid"
-    );}
+    );
+    
+    // Réinitialiser les flags après un délai de 3 secondes (délai d'attente)
+    setTimeout(() => {
+        scanProcessing = false;
+        scanCooldown = false;
+        lastScannedCode = null;
+        console.log("✅ Délai d'attente terminé - prêt pour un nouveau scan");
+    }, 3000);
 }
 
 // Afficher le popup
@@ -198,6 +295,16 @@ function showPopup(message, type) {
 // Reprendre le scan
 function restartScan() {
     document.getElementById("popup").style.display = "none";
+    
+    // Réinitialiser les flags
+    scanProcessing = false;
+    scanCooldown = false;
+    lastScannedCode = null;
+    
+    // #region agent log
+    DEBUG_LOG('app.js:272', 'restartScan called', {isScanning}, 'E');
+    // #endregion
+    console.log("🔄 Redémarrage du scan...");
     
     // Redémarrer le scanner seulement si on clique sur "Scanner suivant"
     if (!isScanning) {
