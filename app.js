@@ -289,8 +289,9 @@ function showPopup(message, type) {
     
     content.className = type;
         // Désactiver la traduction sur le contenu
-    popupResult.setAttribute("translate", "no");
-    popupResult.setAttribute("data-translate", "no");
+    //popupResult.setAttribute("translate", "no");
+    //popupResult.setAttribute("data-translate", "no");
+    //popupResult.innerHTML = message;
     document.getElementById("popup-result").innerHTML = message;
     popup.style.display = "flex";
 }
