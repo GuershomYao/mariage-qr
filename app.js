@@ -1,5 +1,6 @@
 let invites = {};
 let scanner = null;
+let isScanning = false;
 
 // Code admin (vous pouvez le changer)
 const ADMIN_CODE = "";
@@ -79,8 +80,11 @@ document.addEventListener("DOMContentLoaded", function() {
 // Déconnexion
 function logout() {
     if (scanner) {
-        scanner.clear();
+        try {
+            scanner.clear();
+        } catch(e) {}
         scanner = null;
+        isScanning = false;
     }
     document.getElementById("login-page").style.display = "flex";
     document.getElementById("main-page").style.display = "none";
@@ -92,6 +96,10 @@ function logout() {
 
 // Démarrer le scan
 function startScan() {
+    if (isScanning) {
+        return;
+    }
+    
     const startBtn = document.getElementById("start-scan-btn");
     startBtn.disabled = true;
     startBtn.textContent = "Scan en cours...";
@@ -120,6 +128,8 @@ function startScan() {
         false // verbose = false
     );
     
+    isScanning = true;
+    
     // Rendre le scanner avec le callback
     scanner.render(onScanSuccess, onScanError);
     
@@ -133,7 +143,17 @@ function onScanError(errorMessage) {
 
 // Fonction de callback pour le scan réussi (basée sur l'ancien code)
 function onScanSuccess(decodedText) {
-        // Jouer le son de scan
+    // Arrêter le scanner IMMÉDIATEMENT pour éviter les scans multiples
+    if (scanner && isScanning) {
+        try {
+            scanner.clear();
+            isScanning = false;
+        } catch(e) {
+            console.error("Erreur lors de l'arrêt du scanner:", e);
+        }
+    }
+    
+    // Jouer le son de scan
     playScanSound();
     
     let code = decodedText.trim();
@@ -155,13 +175,12 @@ function onScanSuccess(decodedText) {
     
     // Marquer comme utilisé
     guest.used = true;
+
     showPopup(
         "✅ " + guest.nom +
         "<br>Nombre : " + guest.Number +
         "<br>Table : " + guest.table,
         "valid"
-
-    
     );
 }
 
@@ -178,5 +197,9 @@ function showPopup(message, type) {
 // Reprendre le scan
 function restartScan() {
     document.getElementById("popup").style.display = "none";
-    // Le scanner Html5QrcodeScanner reprend automatiquement après la fermeture du popup
+    
+    // Redémarrer le scanner seulement si on clique sur "Scanner suivant"
+    if (!isScanning) {
+        startScan();
+    }
 }
