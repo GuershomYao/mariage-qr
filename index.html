@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
+<html lang="en" translate="no">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate">
 <title>Scan invités mariage</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
@@ -275,7 +277,7 @@ button:hover {
 </head>
 
 <body>
-
+<body translate="no">
 <!-- PAGE DE CONNEXION -->
 <div id="login-page">
     <div id="login-container">
@@ -299,9 +301,9 @@ button:hover {
         <button id="start-scan-btn" onclick="startScan()">📷 Lancer le scan</button>
     </div>
     
-    <div id="popup">
-        <div id="popup-content">
-            <div id="popup-result"></div>
+    <div id="popup" class="notranslate" translate="no">
+        <div id="popup-content" class="notranslate" translate="no">
+            <div id="popup-result" class="notranslate" translate="no"></div>
             <button onclick="restartScan()">Scanner suivant</button>
         </div>
     </div>
