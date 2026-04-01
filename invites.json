@@ -138,8 +138,8 @@
    "used": false
  },
  "INV024": {
-   "Number": "01",
-   "nom": "AMOUSSOU Yann",
+   "Number": "03",
+   "nom": "AMOUSSOU Yann, AMOUSSOU Aude, AMOUSSOU Sousso",
    "table": "Table 5",
    "used": false
  },
@@ -577,13 +577,13 @@
   },
  "INV097": {
    "Number": "02",
-   "nom": "",
+   "nom": "ESSROWOGBONO Alex, ESSROWOGBONO Victoire ",
    "table": "Table 3",
    "used": false
  },
  "INV098": {
-   "Number": "02",
-   "nom": "",
+   "Number": "02 (1 Enfant)",
+   "nom": "APETY Esther Melia, APETY Enam Japheth",
    "table": "Table 4",
    "used": false
  },
