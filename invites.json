@@ -775,19 +775,19 @@
  },
  "INV130": {
    "Number": "01",
-   "nom": "",
+   "nom": "ATTIOGBE Sévérin",
    "table": "Table 1",
    "used": false
  },
  "INV131": {
-   "Number": "01",
-   "nom": "",
+   "Number": "02",
+   "nom": "DJAN Anani, Mme DJAN",
    "table": "Table 2",
    "used": false
  },
  "INV132": {
    "Number": "02",
-   "nom": "",
+   "nom": "AZIANKO Dodji",
    "table": "Table 3",
    "used": false
  }
