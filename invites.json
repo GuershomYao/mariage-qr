@@ -838,5 +838,17 @@
    "nom": "Raymond",
    "table": "Table 3",
    "used": false
+ },
+ "INV141": {
+   "Number": "01",
+   "nom": "Maman Bénie",
+   "table": "Table 3",
+   "used": false
+ },
+ "INV142": {
+   "Number": "02(01 enfant)",
+   "nom": "ADEKPOE Bidemi",
+   "table": "Table 3",
+   "used": false
  }
 }
