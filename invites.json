@@ -612,14 +612,14 @@
    "used": false
  },
  "INV103": {
-   "Number": "02",
-   "nom": "AMEGNAGLO Edoh, Mme AMEGNAGLO",
+   "Number": "01",
+   "nom": "GASSIHOUN Esaïe",
    "table": "Table 4",
    "used": false
  },
  "INV104": {
    "Number": "01",
-   "nom": "GBEDJE Kodjo",
+   "nom": "ADEDIHA Tina",
    "table": "Table 5",
    "used": false
  },
@@ -667,7 +667,7 @@
  },
  "INV112": {
    "Number": "01",
-   "nom": "AKAKPO Elizabeth",
+   "nom": "Soeur Nadège",
    "table": "Table 3",
    "used": false
  },
@@ -726,7 +726,7 @@
    "used": false
  },
  "INV122": {
-   "Number": "02",
+   "Number": "01",
    "nom": "GBOTCHO Georgette",
    "table": "Table 3",
    "used": false
@@ -848,6 +848,12 @@
  "INV142": {
    "Number": "02(01 enfant)",
    "nom": "ADEKPOE Bidemi",
+   "table": "Table 3",
+   "used": false
+ },
+ "INV143": {
+   "Number": "02",
+   "nom": "ADONSOU Jacques, ADONSOU Véronique",
    "table": "Table 3",
    "used": false
  }
