@@ -856,5 +856,17 @@
    "nom": "ADONSOU Jacques, ADONSOU Véronique",
    "table": "Table 3",
    "used": false
+ },
+ "INV144": {
+   "Number": "01",
+   "nom": "GASSIHOUN Afansi",
+   "table": "Table 3",
+   "used": false
+ },
+ "INV145": {
+   "Number": "01",
+   "nom": "EDZIWONOU Fofo",
+   "table": "Table 3",
+   "used": false
  }
 }
